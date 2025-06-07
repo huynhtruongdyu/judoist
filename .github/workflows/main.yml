@@ -1,0 +1,33 @@
+name: Deploy Blazor WASM PWA to GitHub Pages
+
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  build-deploy:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout Repo
+        uses: actions/checkout@v4
+
+      - name: Setup .NET
+        uses: actions/setup-dotnet@v3
+        with:
+          version: '8.x'
+
+      - name: Restore Dependencies
+        run: dotnet restore
+
+      - name: Build Blazor App for PWA
+        run: dotnet publish -c Release --output ./publish
+
+      - name: Deploy to GitHub Pages
+        uses: peaceiris/actions-gh-pages@v3
+        with:
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          publish_dir: ./publish/wwwroot
+          enable_jekyll: false
+          commit_message: ${{ github.event.head_commit.message }}
